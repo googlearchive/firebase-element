@@ -382,12 +382,8 @@ Example:
       }
     },
     dataChange: function() {
-      //this.job('change', function() {
-        if (this.data) {
-          this.keys = this.data ? Object.keys(this.data) : [];
-        }
+        this.keys = this.data ? Object.keys(this.data) : [];
         this.fire('data-change');
-      //});
     },
     //
     // client-side effects
