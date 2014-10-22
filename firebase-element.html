@@ -234,18 +234,20 @@ Example:
         if (this.limit > 0) {
           query = query.limit(this.limit);
         }
-        this.query = query;
       }
+      this.query = query;
     },
     queryChanged: function() {
       // initialize
       this._setData(null);
       // data acquisition
       this.dataReady = false;
-      this.valueLoading = true;
-      this.query.once('value', this.valueLoaded, this);
-      // observe server-side data
-      this.observeQuery();
+      if (this.query) {
+        this.valueLoading = true;
+        this.query.once('value', this.valueLoaded, this);
+        // observe server-side data
+        this.observeQuery();
+      }
     },
     valueLoaded: function(snapshot) {
       this.valueLoading = false;
@@ -380,12 +382,8 @@ Example:
       }
     },
     dataChange: function() {
-      //this.job('change', function() {
-        if (this.data) {
-          this.keys = this.data ? Object.keys(this.data) : [];
-        }
-        this.fire('data-change');
-      //});
+      this.keys = this.data ? Object.keys(this.data) : [];
+      this.fire('data-change');
     },
     //
     // client-side effects
