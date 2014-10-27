@@ -270,6 +270,8 @@ Example:
     },
     _setData: function(data) {
       this.closeObserver();
+      if (data === null)
+        data = {};
       this.data = this._data = data;
       this.observeData();
     },
