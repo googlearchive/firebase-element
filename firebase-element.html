@@ -280,6 +280,7 @@ Example:
       // server side dynamics
       this.query.on('child_added', this.childAdded, this.errorHandler, this);
       this.query.on('child_changed', this.childChanged, this.errorHandler, this);
+      this.query.on('child_moved', this.childMoved, this.errorHandler, this);
       this.query.on('child_removed', this.childRemoved, this.errorHandler, this);
     },
     closeQuery: function() {
@@ -345,6 +346,12 @@ Example:
         this.modulateData('updateData', snapshot);
       }
       this.childEvent('child-changed', snapshot);
+    },
+    childMoved: function(snapshot) {
+      if (!this.valueLoading) {
+        this.modulateData('updateData', snapshot);
+      }
+      this.childEvent('child-moved', snapshot);
     },
     childRemoved: function(snapshot) {
       if (!this.valueLoading) {
