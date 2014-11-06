@@ -165,6 +165,19 @@ Example:
       limit: 0,
       /**
        * Specify a starting record for the set of records reflected on the client.
+       * This method is deprecated. Use limitToFirst() and limitToLast() instead.
+       * @attribute start
+       * @type Any
+       */
+      limitToFirst: 0,
+      /**
+       * Specify a maximum number of records reflected on the client limited to the first certain number of children.
+       * @attribute start
+       * @type Any
+       */
+      limitToLast: 0,
+      /**
+       * Specify a maximum number of records reflected on the client limited to the last certain number of children.
        * @attribute start
        * @type Any
        */
@@ -241,6 +254,12 @@ Example:
         }
         if (this.limit > 0) {
           query = query.limit(this.limit);
+        }
+        if (this.limitToFirst > 0) {
+          query = query.limitToFirst(this.limitToFirst);
+        }
+        if (this.limitToLast > 0) {
+          query = query.limitToLast(this.limitToLast);
         }
         this.query = query;
       }
