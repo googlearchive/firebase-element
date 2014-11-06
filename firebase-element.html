@@ -106,7 +106,7 @@ adds an entry to an Object using a string key instead of an index.
 Firebase supports notifications when properties on `data` are removed, added, or modified.
 Any of these changes will cause firebase-element to fire `data-change` method as described
 above. However, you can also listen for discrete child events, by setting `childEvents`
-property to true. The events are `child-added`, `child-removed`, and `child-changed`. Each
+property to true. The events are `child-added`, `child-moved` `child-removed`, and `child-changed`. Each
 `event` object has a `detail` property with `name` and `value` properties identifying the
 modified item.
 
@@ -159,29 +159,47 @@ Example:
       ref: null,
       /**
        * Restricts the number of records reflected on the client.
+       * This method is deprecated. Use limitToFirst() and limitToLast() instead.
        * @attribute limit
        * @type Number
        */
       limit: 0,
       /**
-       * Specify a starting record for the set of records reflected on the client.
-       * This method is deprecated. Use limitToFirst() and limitToLast() instead.
-       * @attribute start
+       * Specify a maximum number of records reflected on the client limited to the first certain number of children.
+       * @attribute limitToFirst
        * @type Any
        */
       limitToFirst: 0,
       /**
-       * Specify a maximum number of records reflected on the client limited to the first certain number of children.
-       * @attribute start
+       * Specify a maximum number of records reflected on the client limited to the last certain number of children.
+       * @attribute limitToLast
        * @type Any
        */
       limitToLast: 0,
       /**
-       * Specify a maximum number of records reflected on the client limited to the last certain number of children.
+       * Specify an start record for the set of records reflected on the client.
        * @attribute start
        * @type Any
        */
       start: null,
+      /**
+       * Specify a child key to order the set of records reflected on the client.
+       * @attribute orderByChild
+       * @type Any
+       */
+      orderByChild: null,
+      /**
+       * Specify to order by key the set of records reflected on the client.
+       * @attribute orderByKey
+       * @type Any
+       */
+      orderByKey: null,
+      /**
+       * Specify to order by priority the set of records reflected on the client.
+       * @attribute orderByPriority
+       * @type Any
+       */
+      orderByPriority: null,
       /**
        * Specify an ending record for the set of records reflected on the client.
        * @attribute end
@@ -201,7 +219,7 @@ Example:
        */
       keys: null,
       /**
-       * If true, will fire `child-added`, `child-removed`, `child-changed` events.
+       * If true, will fire `child-added`,`child-moved` `child-removed`, `child-changed` events.
        * @attribute childEvents
        * @type Boolean
        */
@@ -246,7 +264,8 @@ Example:
       // construct new query
       var query = this.ref;
       if (query) {
-        if (this.start) {
+        if (this.start && !this.orderByKey) {
+          console.log("requery: startAt", this.start);
           query = query.startAt(this.start);
         }
         if (this.end) {
@@ -261,7 +280,26 @@ Example:
         if (this.limitToLast > 0) {
           query = query.limitToLast(this.limitToLast);
         }
+        if (this.orderByChild) {
+          console.log("requery: orderByChild", this.orderByChild, this.ref);
+          query = query.orderByChild(this.orderByChild);
+        }
+        if (this.orderByKey) {
+          if (this.start) {
+            query = query.orderByKey().startAt(this.start);
+          } else  {
+            query = query.orderByKey();
+          }
+          // console.log("requery: orderByKey", query);
+
+        }
+        if (this.orderByPriority) {
+          console.log("requery: orderByPriority", this.ref);
+          query = query.orderByPriority();
+        }
         this.query = query;
+        // console.log("requery: query", this.query)
+
       }
     },
     queryChanged: function() {
