@@ -167,13 +167,13 @@ Example:
       /**
        * Specify a maximum number of records reflected on the client limited to the first certain number of children.
        * @attribute limitToFirst
-       * @type Any
+       * @type Number
        */
       limitToFirst: 0,
       /**
        * Specify a maximum number of records reflected on the client limited to the last certain number of children.
        * @attribute limitToLast
-       * @type Any
+       * @type Number
        */
       limitToLast: 0,
       /**
@@ -182,6 +182,12 @@ Example:
        * @type Any
        */
       start: null,
+      /**
+       * Specify an ending record for the set of records reflected on the client.
+       * @attribute end
+       * @type Any
+       */
+      end: null,
       /**
        * Specify a child key to order the set of records reflected on the client.
        * @attribute orderByChild
@@ -200,12 +206,6 @@ Example:
        * @type Any
        */
       orderByPriority: null,
-      /**
-       * Specify an ending record for the set of records reflected on the client.
-       * @attribute end
-       * @type Any
-       */
-      end: null,
       /**
        * The `data` object mapped to `location`.
        * @attribute data
@@ -264,14 +264,14 @@ Example:
       // construct new query
       var query = this.ref;
       if (query) {
-        if (this.start && !this.orderByKey) {
-          console.log("requery: startAt", this.start);
+        if (this.start) {
           query = query.startAt(this.start);
         }
         if (this.end) {
           query = query.endAt(this.end);
         }
         if (this.limit > 0) {
+          console('limit method is deprecated as firebase 2.0.0. Use limitToFirst() and limitToLast() instead.');
           query = query.limit(this.limit);
         }
         if (this.limitToFirst > 0) {
@@ -281,25 +281,15 @@ Example:
           query = query.limitToLast(this.limitToLast);
         }
         if (this.orderByChild) {
-          console.log("requery: orderByChild", this.orderByChild, this.ref);
           query = query.orderByChild(this.orderByChild);
         }
         if (this.orderByKey) {
-          if (this.start) {
-            query = query.orderByKey().startAt(this.start);
-          } else  {
-            query = query.orderByKey();
-          }
-          // console.log("requery: orderByKey", query);
-
+          query = query.orderByKey();
         }
         if (this.orderByPriority) {
-          console.log("requery: orderByPriority", this.ref);
           query = query.orderByPriority();
         }
         this.query = query;
-        // console.log("requery: query", this.query)
-
       }
     },
     queryChanged: function() {
