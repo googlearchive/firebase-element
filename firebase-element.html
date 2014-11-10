@@ -207,6 +207,12 @@ Example:
        */
       orderByPriority: null,
       /**
+       * Specify to create a query which includes children which match the specified value. The argument type depends on which orderBy*() function was used in this query. Specify a value that matches the orderBy*() type.
+       * @attribute equalTo
+       * @type Any
+       */
+      equalTo: null,
+      /**
        * The `data` object mapped to `location`.
        * @attribute data
        * @type Object
@@ -271,7 +277,7 @@ Example:
           query = query.endAt(this.end);
         }
         if (this.limit > 0) {
-          console('limit method is deprecated as firebase 2.0.0. Use limitToFirst() and limitToLast() instead.');
+          console.log('limit method is deprecated as firebase 2.0.0. Use limitToFirst() and limitToLast() instead.');
           query = query.limit(this.limit);
         }
         if (this.limitToFirst > 0) {
@@ -288,6 +294,9 @@ Example:
         }
         if (this.orderByPriority) {
           query = query.orderByPriority();
+        }
+        if (this.equalTo) {
+          query = query.equalTo(this.equalTo);
         }
         this.query = query;
       }
