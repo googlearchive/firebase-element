@@ -18,7 +18,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <body unresolved>
 
   <template is="auto-binding">
-    <!-- <firebase-element id="actions" on-data-change="{{actionDataChange}}" data="{{actionsData}}" keys="{{actionsKeys}}"  location="https://actionplanr-dev.firebaseio.com/sections2/2/doc_sections/0/doc_actions" log></firebase-element> -->
     <style>
     .dinosaur-row {
       width: 760px;
@@ -28,13 +27,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     }
     </style>
 
-    <firebase-element id="base" on-data-change="{{dataChange}}" data="{{data}}" location="https://treedata-demo.firebaseio.com/demo"></firebase-element>
+    <firebase-element id="base" on-data-change="{{dataChange}}" data="{{data}}" location="https://treedata-demo.firebaseio.com/demo" log></firebase-element>
 
-    <firebase-element id="dinosaur" on-data-change="{{dinosaurDataChange}}" data="{{dinosaurData}}" keys="{{dinosaurKeys}}" orderByChild="order"  location="https://dinosaur-facts.firebaseio.com/"></firebase-element>
-    <firebase-element id="dinosaurChild" childEvents on-child-added="{{dinosaurChildAdded}}" orderByChild="order" location="https://dinosaur-facts.firebaseio.com/">
+    <firebase-element id="dinosaur" on-data-change="{{dinosaurDataChange}}" data="{{dinosaurData}}" keys="{{dinosaurKeys}}" orderByChild="order" location="https://dinosaur-facts.firebaseio.com/"></firebase-element>
+    <firebase-element id="dinosaurChild" childEvents on-child-added="{{dinosaurChildAdded}}" orderByChild="order" location="https://dinosaur-facts.firebaseio.com/" log>
     <firebase-element id="dinosaurLimitFirst" data="{{dinosaurLimitFirstData}}" keys="{{dinosaurLimitFirstKeys}}" limitToFirst="2" location="https://dinosaur-facts.firebaseio.com/"></firebase-element>
     <firebase-element id="dinosaurLimitLast" data="{{dinosaurLimitLastData}}" keys="{{dinosaurLimitLastKeys}}" limitToLast="3" location="https://dinosaur-facts.firebaseio.com/"></firebase-element>
-    <firebase-element id="dinosaurEqualTo"  data="{{dinosaurEqualToData}}" keys="{{dinosaurEqualToKeys}}" orderByChild="order" equalTo="ornithischia"  location="https://dinosaur-facts.firebaseio.com/" log></firebase-element>
+    <firebase-element id="dinosaurEqualTo"  data="{{dinosaurEqualToData}}" keys="{{dinosaurEqualToKeys}}" orderByChild="order" equalTo="ornithischia"  location="https://dinosaur-facts.firebaseio.com/"></firebase-element>
 
     <h3>Top-level properties persist automatically:</h3>
 
@@ -243,7 +242,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     };
 
     scope.dinosaurDataChange = function() {
-      console.log("dinosaurDataChange");
       scope.listOrderByChild();
     };
 
@@ -254,7 +252,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     scope.listOrderByChild = function() {
       var ref = new Firebase("https://dinosaur-facts.firebaseio.com/");
-      console.log('dinosaur-facts by child order startAt letter s');
+      // console.log('dinosaur-facts by child order startAt letter p');
       var data = '';
       var parentDiv = document.getElementById("firebase-query-wrapper");
       var counter = 1;
@@ -311,7 +309,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         counter++;
 
       });
-      console.log(data);
+      // console.log(data);
     };
 
     dinosaurChildCounter = 1;
@@ -319,7 +317,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       var data = '';
       var parentDiv = document.getElementById("firebase-child-added-query-wrapper");
 
-      data = event.detail.name + " was " + event.detail.value.height + " meters tall" + " -- order " + event.detail.value.order + " -- dinosaurChildCounter: " + dinosaurChildCounter + '\n';
+      data = event.detail.name + " was " + event.detail.value.height + " meters tall" + " -- order " + event.detail.value.order + " -- dinosaurChildCounter: " + dinosaurChildCounter;
       console.log(data);
 
       var rowDiv = document.createElement("div");
