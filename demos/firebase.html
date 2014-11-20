@@ -14,15 +14,48 @@
   <title>firebase-element</title>
 
   <script src="../../webcomponentsjs/webcomponents.js"></script>
-  
+
   <link rel="import" href="../firebase-element.html">
 
 </head>
 <body unresolved>
 
   <template is="auto-binding">
+    <style>
+    .dinosaur-row {
+      width: 760px;
+      padding: 5px;
+      text-align: right;
+      border-bottom: 1px dotted;
+    }
+
+    .dinosaur-header {
+      font-weight: bold;
+      padding: 5px;
+      text-align: right;
+      border: 1px solid;
+      width: 760px;
+    }
+
+    .dinosaur-name {
+      width: 150px;
+      text-align: left;
+    }
+
+    .dinosaur-column-rignt {
+      width: 100px;
+      text-align: right;
+    }
+
+    </style>
 
     <firebase-element id="base" on-data-change="{{dataChange}}" data="{{data}}" location="https://treedata-demo.firebaseio.com/demo" log></firebase-element>
+
+    <firebase-element id="dinosaur" data="{{dinosaurData}}" keys="{{dinosaurKeys}}" location="https://dinosaur-facts.firebaseio.com/" ></firebase-element>
+    <firebase-element id="dinosaurEqualTo"  data="{{dinosaurEqualToData}}" keys="{{dinosaurEqualToKeys}}" orderByChild="order" equalTo="ornithischia"  location="https://dinosaur-facts.firebaseio.com/"></firebase-element>
+    <firebase-element id="dinosaurChild" childEvents on-child-added="{{dinosaurChildAdded}}" orderByChild="height" location="https://dinosaur-facts.firebaseio.com/" log>
+
+    <!-- <firebase-element id="dinosaurOrdered" data="{{dinosaurOrderedData}}" keys="{{dinosaurOrderedKeys}}" location="https://dinosaur-facts.firebaseio.com/" orderByChild="order"></firebase-element> -->
 
     <h3>Top-level properties persist automatically:</h3>
 
@@ -35,11 +68,11 @@
     <h3>Nested properties must be persisted manually:</h3>
 
     <input value="{{data.more.color}}">
-    
+
     <button on-tap="{{commitMore}}">Commit data.more</button>
-     
+
     <hr>
-    
+
     <h3>Remote Data</h3>
     <pre>{{json}}</pre>
 
@@ -49,12 +82,78 @@
     <button on-tap="{{removeLocal}}">Remove Local</button>
     <button on-tap="{{resetRemote}}">Reset remote</button>
     <button on-tap="{{removeRemote}}">Remove Remote</button>
+    <br>
+    <br>
+    <hr>
+    <hr>
+    <br>
 
+    <h2>Dinosaur Facts -- using template repeat -- All</h2>
+    <div horizontal layout top class="dinosaur-header">
+      <div class="dinosaur-name">Name</div>
+      <div class="dinosaur-column-rignt">Height</div>
+      <div class="dinosaur-column-rignt">Length</div>
+      <div class="dinosaur-column-rignt">Weight</div>
+      <div class="dinosaur-column-rignt">Appeared</div>
+      <div class="dinosaur-column-rignt">Vanished</div>
+      <div class="dinosaur-column-rignt">Order</div>
+    </div>
+    <template repeat="{{key in dinosaurKeys }}">
+      <div horizontal layout top class="dinosaur-row">
+        <div class="dinosaur-name">{{key}}</div>
+        <div class="dinosaur-column-rignt">{{dinosaurData[key].height}}</div>
+        <div class="dinosaur-column-rignt">{{dinosaurData[key].length}}</div>
+        <div class="dinosaur-column-rignt">{{dinosaurData[key].weight}}</div>
+        <div class="dinosaur-column-rignt">{{dinosaurData[key].appeared}}</div>
+        <div class="dinosaur-column-rignt">{{dinosaurData[key].vanished}}</div>
+        <div class="dinosaur-column-rignt">{{dinosaurData[key].order}}</div>
+      </div>
+    </template>
+    <br>
+    <br>
+
+    <h2>Dinosaur Facts --  EqualTo ornithischia</h2>
+    <div horizontal layout top class="dinosaur-header">
+      <div class="dinosaur-name">Name</div>
+      <div class="dinosaur-column-rignt">Height</div>
+      <div class="dinosaur-column-rignt">Length</div>
+      <div class="dinosaur-column-rignt">Weight</div>
+      <div class="dinosaur-column-rignt">Appeared</div>
+      <div class="dinosaur-column-rignt">Vanished</div>
+      <div class="dinosaur-column-rignt">Order</div>
+    </div>
+    <template repeat="{{key in dinosaurEqualToKeys }}">
+      <div horizontal layout top class="dinosaur-row">
+        <div class="dinosaur-name">{{key}}</div>
+        <div class="dinosaur-column-rignt">{{dinosaurData[key].height}}</div>
+        <div class="dinosaur-column-rignt">{{dinosaurData[key].length}}</div>
+        <div class="dinosaur-column-rignt">{{dinosaurData[key].weight}}</div>
+        <div class="dinosaur-column-rignt">{{dinosaurData[key].appeared}}</div>
+        <div class="dinosaur-column-rignt">{{dinosaurData[key].vanished}}</div>
+        <div class="dinosaur-column-rignt">{{dinosaurData[key].order}}</div>
+      </div>
+    </template>
+    <br>
+    <br>
+
+    <h2>Dinosaur Facts -- orderByChild height -- All</h2>
+    <div horizontal layout top class="dinosaur-header">
+      <div class="dinosaur-name">Name</div>
+      <div class="dinosaur-column-rignt">Height</div>
+      <div class="dinosaur-column-rignt">Length</div>
+      <div class="dinosaur-column-rignt">Weight</div>
+      <div class="dinosaur-column-rignt">Appeared</div>
+      <div class="dinosaur-column-rignt">Vanished</div>
+      <div class="dinosaur-column-rignt">Order</div>
+    </div>
+    <div id="firebase-child-added-query-wrapper" vertical layout top style="width: 760px;"></div>
+    <br>
+    <br>
 
   </template>
-  
+
   <script>
-    
+
     addEventListener('template-bound', function(e) {
 
       scope = e.target;
@@ -73,7 +172,7 @@
       scope.removeLocal = function() {
         this.data = null;
       };
-      
+
       scope.resetRemote = function() {
         // Simulate other actor setting data to same remote location
         new Firebase('https://treedata-demo.firebaseio.com/demo').set({
@@ -93,11 +192,75 @@
       scope.commitMore = function() {
         this.$.base.commitProperty('more');
       };
-      
+
       scope.dataChange = function() {
         this.json = JSON.stringify(this.data, null, '\t');
       };
-      
+
+      var dinosaurChildCounter = 1;
+      scope.dinosaurChildAdded = function(event) {
+        var data = '';
+        var parentDiv = document.getElementById("firebase-child-added-query-wrapper");
+
+        // data = event.detail.name + " was " + event.detail.value.height + " meters tall" + " -- order " + event.detail.value.order + " -- dinosaurChildCounter: " + dinosaurChildCounter;
+        // console.log(data);
+
+        var rowDiv = document.createElement("div");
+        rowDiv.setAttribute('id','childRow_' + dinosaurChildCounter.toString());
+        rowDiv.setAttribute('class','dinosaur-row');
+        rowDiv.setAttribute('horizontal',true);
+        rowDiv.setAttribute('layout',true);
+        rowDiv.setAttribute('top',true);
+        parentDiv.appendChild(rowDiv);
+        var rowDivAdded = document.getElementById("childRow_" + dinosaurChildCounter.toString());
+
+        var keyDiv = document.createElement("div");
+        keyDiv.setAttribute('class','dinosaur-name');
+        keyDiv.innerHTML = event.detail.name;
+        rowDivAdded.appendChild(keyDiv);
+
+        var divStyle = "width: 100px;";
+
+        var heightDiv = document.createElement("div");
+        // heightDiv.setAttribute('style',divStyle);
+        heightDiv.setAttribute('class','dinosaur-column-rignt');
+        heightDiv.innerHTML = event.detail.value.height;
+        rowDivAdded.appendChild(heightDiv);
+
+        var weightDiv = document.createElement("div");
+        // weightDiv.setAttribute('style',divStyle);
+        weightDiv.setAttribute('class','dinosaur-column-rignt');
+        weightDiv.innerHTML = event.detail.value.weight;
+        rowDivAdded.appendChild(weightDiv);
+
+        var lengthDiv = document.createElement("div");
+        //lengthDiv.setAttribute('style',divStyle);
+        lengthDiv.setAttribute('class','dinosaur-column-rignt');
+        lengthDiv.innerHTML = event.detail.value.length;
+        rowDivAdded.appendChild(lengthDiv);
+
+        var appearedDiv = document.createElement("div");
+        // appearedDiv.setAttribute('style',divStyle);
+        appearedDiv.setAttribute('class','dinosaur-column-rignt');
+        appearedDiv.innerHTML = event.detail.value.appeared;
+        rowDivAdded.appendChild(appearedDiv);
+
+        var vanishedDiv = document.createElement("div");
+        // vanishedDiv.setAttribute('style',divStyle);
+        vanishedDiv.setAttribute('class','dinosaur-column-rignt');
+        vanishedDiv.innerHTML = event.detail.value.vanished;
+        rowDivAdded.appendChild(vanishedDiv);
+
+        var orderDiv = document.createElement("div");
+        // orderDiv.setAttribute('style',divStyle);
+        orderDiv.setAttribute('class','dinosaur-column-rignt');
+        orderDiv.innerHTML = event.detail.value.order;
+        rowDivAdded.appendChild(orderDiv);
+
+        dinosaurChildCounter++;
+
+      };
+
     });
   </script>
 
