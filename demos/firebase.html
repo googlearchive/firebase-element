@@ -55,8 +55,6 @@
     <firebase-element id="dinosaurEqualTo"  data="{{dinosaurEqualToData}}" keys="{{dinosaurEqualToKeys}}" orderByChild="order" equalTo="ornithischia"  location="https://dinosaur-facts.firebaseio.com/"></firebase-element>
     <firebase-element id="dinosaurChild" childEvents on-child-added="{{dinosaurChildAdded}}" orderByChild="height" location="https://dinosaur-facts.firebaseio.com/" log>
 
-    <!-- <firebase-element id="dinosaurOrdered" data="{{dinosaurOrderedData}}" keys="{{dinosaurOrderedKeys}}" location="https://dinosaur-facts.firebaseio.com/" orderByChild="order"></firebase-element> -->
-
     <h3>Top-level properties persist automatically:</h3>
 
     <input value="{{data.name}}">
@@ -202,9 +200,6 @@
         var data = '';
         var parentDiv = document.getElementById("firebase-child-added-query-wrapper");
 
-        // data = event.detail.name + " was " + event.detail.value.height + " meters tall" + " -- order " + event.detail.value.order + " -- dinosaurChildCounter: " + dinosaurChildCounter;
-        // console.log(data);
-
         var rowDiv = document.createElement("div");
         rowDiv.setAttribute('id','childRow_' + dinosaurChildCounter.toString());
         rowDiv.setAttribute('class','dinosaur-row');
@@ -219,40 +214,32 @@
         keyDiv.innerHTML = event.detail.name;
         rowDivAdded.appendChild(keyDiv);
 
-        var divStyle = "width: 100px;";
-
         var heightDiv = document.createElement("div");
-        // heightDiv.setAttribute('style',divStyle);
         heightDiv.setAttribute('class','dinosaur-column-rignt');
         heightDiv.innerHTML = event.detail.value.height;
         rowDivAdded.appendChild(heightDiv);
 
         var weightDiv = document.createElement("div");
-        // weightDiv.setAttribute('style',divStyle);
         weightDiv.setAttribute('class','dinosaur-column-rignt');
         weightDiv.innerHTML = event.detail.value.weight;
         rowDivAdded.appendChild(weightDiv);
 
         var lengthDiv = document.createElement("div");
-        //lengthDiv.setAttribute('style',divStyle);
         lengthDiv.setAttribute('class','dinosaur-column-rignt');
         lengthDiv.innerHTML = event.detail.value.length;
         rowDivAdded.appendChild(lengthDiv);
 
         var appearedDiv = document.createElement("div");
-        // appearedDiv.setAttribute('style',divStyle);
         appearedDiv.setAttribute('class','dinosaur-column-rignt');
         appearedDiv.innerHTML = event.detail.value.appeared;
         rowDivAdded.appendChild(appearedDiv);
 
         var vanishedDiv = document.createElement("div");
-        // vanishedDiv.setAttribute('style',divStyle);
         vanishedDiv.setAttribute('class','dinosaur-column-rignt');
         vanishedDiv.innerHTML = event.detail.value.vanished;
         rowDivAdded.appendChild(vanishedDiv);
 
         var orderDiv = document.createElement("div");
-        // orderDiv.setAttribute('style',divStyle);
         orderDiv.setAttribute('class','dinosaur-column-rignt');
         orderDiv.innerHTML = event.detail.value.order;
         rowDivAdded.appendChild(orderDiv);
