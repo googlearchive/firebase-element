@@ -3,6 +3,7 @@
   "private": true,
   "dependencies": {
     "polymer": "Polymer/polymer#master",
-    "firebase": "^2"
+    "firebase": "^2",
+    "Firebase.getAsArray": "~0.1.0"
   }
 }
