@@ -1,0 +1,48 @@
+<link rel="import" href="firebase-element.html">
+<!--
+
+  Allows you to write pure firebase awesomeness!!!
+
+  <firebase-model id="base" app="{{globals.firebase}}" path="questions" data="{{questions}}" keys="{{keys}}"></firebase-element>
+  <pvc-globals values="{{globals}}"></pvc-globals>
+
+  Polymer({
+    ready: function() {
+      this.globals.firebase = 'baby-light-my-fire';
+    },
+    ...
+
+
+  TODO: Extract into Mixins which can be mixed and matcher :)
+-->
+<polymer-element name="firebase-model" attributes="protocol app path list" extends="firebase-element">
+<script src="scripts/firebase-as-array.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  Polymer({
+    app: null,
+    path: null,
+    protocol: 'http://',
+    observe: {
+      protocol: 'updateEndpoint',
+      app: 'updateEndpoint',
+      path: 'updateEndpoint'
+    },
+    // we can only set the list atribute when ref has changed (ie. not null)
+    refChanged: function() {
+      this.list = Firebase.getAsArray(this.ref);
+    },
+    // we can only set the list atribute when ref has changed (ie. not null)
+    updateEndpoint: function() {
+      this.endpoint = this.protocol + this.app + '.firebaseio.com';
+    },
+    endpointChanged: function() {
+      this.location = [this.endpoint, this.path].join('/');
+    }
+  });
+
+})();
+</script>
+</polymer-element>
