@@ -1,10 +1,9 @@
-<link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="firebase-element.html">
 
 <!--
 Element wrapper for Firebase getAsArray extension
 
-`firebase-list` wraps a firebase ref as a `list` property which acts as a Javascript array.
+`firebase-list` wraps a firebase reference (`ref`) as a `list` property which acts as a Javascript array.
 
 This way we can use arrays with collaborative, real-time data:
 
@@ -17,7 +16,8 @@ In other words, our array is essentialy one-directional.
 Changes come from the server into the array, we read them out, we push our local edits to the server,
 they trickle back into the array.
 
-Blog post: [Handling Synchronized Arrays with Real-Time Firebase Data](https://www.firebase.com/blog/2014-05-06-synchronized-arrays.html)
+From blog post: [Handling Synchronized Arrays with Real-Time Firebase Data](https://www.firebase.com/blog/2014-05-06-synchronized-arrays.html)
+Github repo: [Firebase.getAsArray](https://github.com/katowulf/Firebase.getAsArray)
 
 ### API usage
 
@@ -52,20 +52,20 @@ list[1].$id;
 <ul>
 
 -->
-
-<script src="scripts/firebase-as-array.min.js"></script>
-
-<polymer-element name="firebase-list" attributes="list ref">
+<polymer-element name="firebase-list" attributes="list" extends="firebase-element">
+  <!-- firebase-as-array updated to Firebase 2.x API to avoid deprecation warnings -->
+  <script src="scripts/firebase-as-array.js"></script>
   <script>
-    (function () {
-      'use strict';
+  (function () {
+    'use strict';
 
-      Polymer({
-        list: function() {
-          return Firebase.getAsArray(this.ref);
-        }
-      });
+    Polymer({
+      // we can only set the list atribute when ref has changed (ie. not null)
+      refChanged: function() {
+        this.list = Firebase.getAsArray(this.ref);
+      }
+    });
 
-    })();
+  })();
   </script>
 </polymer-element>
