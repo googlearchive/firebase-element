@@ -1,0 +1,71 @@
+<link rel="import" href="firebase-element.html">
+
+<!--
+Element wrapper for Firebase getAsArray extension
+
+`firebase-list` wraps a firebase reference (`ref`) as a `list` property which acts as a Javascript array.
+
+This way we can use arrays with collaborative, real-time data:
+
+- make the array read only (don't use splice, pop, etc; have setter methods)
+- when possible, refer to records using a uniqueId rather than array index
+- synchronize changes from the server directly into our array
+- push local changes to the server and letting them trickle back
+
+In other words, our array is essentialy one-directional.
+Changes come from the server into the array, we read them out, we push our local edits to the server,
+they trickle back into the array.
+
+From blog post: [Handling Synchronized Arrays with Real-Time Firebase Data](https://www.firebase.com/blog/2014-05-06-synchronized-arrays.html)
+Github repo: [Firebase.getAsArray](https://github.com/katowulf/Firebase.getAsArray)
+
+### API usage
+
+```js
+// add a new record
+list.$add({foo: 'bar'});
+
+// remove record
+list.$remove( key );
+
+// set priority on a record
+list.$move( key, newPriority );
+
+// find position of a key in the list
+list.$indexOf( key );
+
+// find key for a record at position 1
+list[1].$id;
+```
+
+### Web components usage
+
+<firebase-element id="base" ref="{{fireRef}}" location="https://xyz.firebaseio.com/"/>
+<firebase-list id="posts" ref="{{fireRef}} list="{{posts}}"/>
+
+<h3>My Firebase Posts list</h3>
+
+<ul>
+<template repeat="{{post in posts}}">
+  <li>{{item.name}}</li>
+</template>
+<ul>
+
+-->
+<polymer-element name="firebase-list" attributes="list" extends="firebase-element">
+  <!-- firebase-as-array updated to Firebase 2.x API to avoid deprecation warnings -->
+  <script src="scripts/firebase-as-array.js"></script>
+  <script>
+  (function () {
+    'use strict';
+
+    Polymer({
+      // we can only set the list atribute when ref has changed (ie. not null)
+      refChanged: function() {
+        this.list = Firebase.getAsArray(this.ref);
+      }
+    });
+
+  })();
+  </script>
+</polymer-element>
