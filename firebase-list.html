@@ -1,0 +1,252 @@
+<link rel="import" href="firebase-element.html">
+<!--
+
+Extends `firebase-element` with behaviors for treating a given location as an
+ordered list of data.
+
+Lists in Firebase are stored the same as ordinary objects. With `firebase-list`
+you can hide much of the complexity of dealing with list-like object data.
+
+Example:
+
+    <firebase-list location="https://YOUR.firebaseio.com/items" data="{{items}}"></firebase-list>
+
+In general `firebase-list` works just like `firebase-element` with a few key
+differences:
+
+1. Each item in the `data` array will have `$key` and `$priority` properties that
+   relate to their Firebase key and priority. Modifying the `$priority` key will
+   set the priority, modifying the `$key` property will delete the data at its
+   current location and recreate it at the newly specified key.
+2. Instead of observing the properties of the top-level `data` object,
+   the properties of each child object are observed. In this way synchronization
+   happens across all child items effortlessly.
+3. Adding and removing items directly from the `data` array is not supported.
+   Instead, you should use the `push` and `remove` methods described below.
+
+When you need to add a new entry to a list, you can use the `push` method with
+the data you wish to add as the argument:
+
+    addEntry: function(value) {
+      this.$.base.push({foo: value});
+    }
+
+To remove a child, simply call the `remove` method with the key of the child
+you want to remove as an argument:
+
+    removeEntry: function(item) {
+      this.$.base.remove(item.$key);
+    }
+
+**Note:** Because you can use this in conjunction with filtering, limiting, and
+sorting attributes, it is possible that you may push or remove entries that are
+not currently represented in the data.
+
+@class firebase-list
+@blurb Extends firebase-element to handle list data in Firebase.
+@status alpha
+@snap snap.png
+
+-->
+<polymer-element name="firebase-list" extends="firebase-element" attributes="reverse">
+  <script>
+    Polymer({
+      /**
+       * When set, the order of `data` will be reversed. This is useful for e.g.
+       * reverse chronological sorting with `limitToLast`.
+       *
+       * @attribute reverse
+       * @type Boolean
+       * @default false
+       */
+      reverse: false,
+
+      created: function() {
+        this.data = [];
+        this.observers = {};
+      },
+      _setData: function() {
+        // we don't do wholesale data-setting in a list
+        return;
+      },
+      dataChanged: function() {
+        return;
+      },
+      observeData: function() {
+        for (var i = 0; i < this.data.length; i++) {
+          if (this.data[i].$key && !this.observers[this.data[i].$key]) {
+            this.openChildObserver(this.data[i]);
+          }
+        }
+      },
+      observeArray: function() {
+        // we don't want to observe this like normal arrays
+        return;
+      },
+      closeObserver: function() {
+        for (var childKey in this.observers) {
+          this.closeChildObserver(childKey)
+        }
+        this.super();
+      },
+      openChildObserver: function(childObject) {
+        this.observers[childObject.$key] = new ObjectObserver(childObject);
+        this.observers[childObject.$key].open(function() {
+          var args = [childObject.$key].concat(Array.prototype.slice.call(arguments));
+          this.observeChildObject.apply(this, args);
+        }.bind(this));
+      },
+      closeChildObserver: function(childKey) {
+        if (this.observers[childKey]) {
+          this.observers[childKey].close();
+          delete this.observers[childKey];
+        }
+      },
+      childAdded: function(snapshot, prevKey) {
+        this._insertChildAfter(prevKey, this._snapshotToChild(snapshot));
+        this.dataChange();
+        this.childEvent('child-added', snapshot);
+      },
+      childChanged: function(snapshot, prevKey) {
+        this._replaceChild(this._snapshotToChild(snapshot));
+        this.dataChange();
+        this.childEvent('child-changed', snapshot);
+      },
+      childMoved: function(snapshot, prevKey) {
+        this._moveChildAfter(snapshot.key(), prevKey);
+        this.dataChange();
+        this.childEvent('child-moved', snapshot);
+      },
+      childRemoved: function(snapshot, prevKey) {
+        this._removeChild(snapshot.key());
+        this.dataChange();
+        this.childEvent('child-removed', snapshot);
+      },
+
+      // decorate a snapshot value with key and priority
+      _snapshotToChild: function(snapshot) {
+        var val = snapshot.val();
+        val.$key = snapshot.key();
+        val.$priority = snapshot.getPriority();
+
+        return val;
+      },
+
+      // private array manipulation methods
+      _insertChildAfter: function(prevKey, childObject) {
+        this.closeChildObserver(childObject.$key);
+
+        if (prevKey === null) {
+          this.reverse ? this.data.push(childObject) : this.data.unshift(childObject);
+        } else {
+          var insertionModifier = this.reverse ? 0 : 1;
+          this.data.splice(this.indexOfChild(prevKey) + insertionModifier, 0, childObject);
+        }
+
+        this.openChildObserver(childObject);
+      },
+      _replaceChild: function(childObject) {
+        this.closeChildObserver(childObject.$key);
+        this.data[this.indexOfChild(childObject.$key)] = childObject;
+        this.openChildObserver(childObject);
+      },
+      _removeChild: function(childKey) {
+        this.closeChildObserver(childKey);
+        return this.data.splice(this.indexOfChild(childKey), 1)[0];
+      },
+      _moveChildAfter: function(childKey, prevKey) {
+        this._insertChildAfter(prevKey, this._removeChild(childKey));
+      },
+
+      /**
+       * Determine the current index of the child with the specified key.
+       *
+       * @method indexOfChild
+       */
+      indexOfChild: function(childKey) {
+        if (childKey && childKey.$key){ childKey = childKey.$key; }
+
+        for (var i = 0; i < this.data.length; i++) {
+          if (this.data[i].$key === childKey) { return i; }
+        }
+      },
+
+      /**
+       * Retrieve the child object with the specified key.
+       *
+       * @method getChild
+       */
+      getChild: function(childKey) {
+        return this.data[this.indexOfChild(childKey)];
+      },
+
+      observeChildObject: function(childKey, added, removed, changed, getOldValueFn) {
+        // client-side dynamics
+        var ctrlr = this;
+        Object.keys(added).forEach(function(property) {
+          ctrlr.commitChildProperty(childKey, property);
+        });
+        Object.keys(removed).forEach(function(property) {
+          ctrlr.removeChildProperty(childKey, property);
+        });
+        Object.keys(changed).forEach(function(property) {
+          ctrlr.commitChildProperty(childKey, property);
+        });
+      },
+      commitChildProperty: function(childKey, prop) {
+        this.log && console.log('commitChildProperty ' + childKey + "/" + prop);
+
+        var childObject = this.getChild(childKey);
+        var childRef = this.ref.child(childKey);
+
+        if (this.ref && childObject) {
+          switch (prop) {
+            case '$priority':
+              childRef.setPriority(childObject[prop]);
+              break;
+
+            case '$key':
+              childRef.transaction(function(currentData) {
+                this.ref.child(childObject[prop]).set(currentData);
+                return null;
+              }.bind(this));
+              break;
+
+            default:
+              childRef.child(prop).set(childObject[prop]);
+          }
+        }
+      },
+      removeChildProperty: function(childKey, prop) {
+        switch (prop) {
+          case '$priority':
+            this.ref.child(childKey).setPriority(null);
+            break;
+          case '$key':
+            this.fire('error', {error: 'Cannot remove the $key property from a list element.'});
+            break;
+          default:
+            this.ref.child([childKey, prop]).join('/').remove(this.errorHandler);
+        }
+      },
+
+      dataChange: function() {
+        this.keys = this.data.map(function(childObject) { return childObject.$key; });
+        this.fire('data-change');
+      },
+      push: function(item) {
+        return this.ref.push(item, this.errorHandler);
+      },
+      remove: function(childKey) {
+        this.ref.child(childKey).remove();
+      },
+      pushWithPriority: function(item, priority) {
+        return this.push(item).setPriority(priority);
+      },
+      // reverse the data when reverse changes
+      reverseChanged: function() {
+        this.data.reverse();
+      }
+    });
+  </script>
+</polymer-element>

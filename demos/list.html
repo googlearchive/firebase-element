@@ -1,0 +1,98 @@
+<!--
+    @license
+    Copyright (c) 2014 The Polymer Project Authors. All rights reserved.
+    This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+    The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+    The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+    Code distributed by Google as part of the polymer project is also
+    subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<!doctype html>
+<html>
+<head>
+
+  <title>firebase-list</title>
+
+  <script src="../../webcomponentsjs/webcomponents.js"></script>
+
+  <link rel="import" href="../firebase-list.html">
+
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      padding: 0 0 30px;
+    }
+
+    #add {
+      box-sizing: border-box;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 30px;
+      padding: 4px;
+      background: #aaa;
+      font-size: 14px;
+    }
+
+    #chat {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    #chat li {
+      border-bottom: 1px solid #ddd;
+    }
+
+    #chat li > div {
+      padding: 8px;
+    }
+
+    #chat li .name {
+      background: #eee;
+      width: 100px;
+      text-align: right;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body unresolved>
+
+  <template is="auto-binding">
+    <firebase-list id="base" log limitToLast="15" location="https://divshot-sandbox.firebaseio.com/firebase-element/items" data="{{items}}"></firebase-list>
+    <ul id="chat"><template repeat="{{item in items}}">
+      <li horizontal layout>
+        <div class="name">{{item.name}}</div><div flex>{{item.message}}</div>
+      </li>
+    </template></ul>
+  </template>
+
+  <form id="add" horizontal layout>
+    <input type="text" id="field-name" placeholder="Name">
+    <input type="text" id="field-message" flex placeholder="Message">
+    <button type="submit">Send</button>
+  </form>
+
+  <script>
+    var form = document.querySelector('#add');
+    var nameField = document.querySelector('#field-name');
+    var messageField = document.querySelector('#field-message');
+
+    form.addEventListener('submit', function(e) {
+      var base = document.querySelector('#base');
+
+      e.preventDefault();
+      base.push({
+        name: nameField.value,
+        message: messageField.value
+      });
+      messageField.value = '';
+      messageField.focus();
+    });
+
+    nameField.focus();
+  </script>
+</body>
+</html>

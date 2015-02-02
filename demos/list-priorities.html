@@ -1,0 +1,74 @@
+<!--
+    @license
+    Copyright (c) 2014 The Polymer Project Authors. All rights reserved.
+    This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+    The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+    The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+    Code distributed by Google as part of the polymer project is also
+    subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<!doctype html>
+<html>
+<head>
+
+  <title>firebase-element</title>
+
+  <script src="../../webcomponentsjs/webcomponents.js"></script>
+
+  <link rel="import" href="../firebase-list.html">
+</head>
+<body unresolved>
+  <h1>Grocery List</h1>
+  <template is="auto-binding">
+    <firebase-list orderByPriority log data="{{items}}" id="base" location="https://divshot-sandbox.firebaseio.com/firebase-element/groceries"></firebase-list>
+    <table border="1" cellspacing="0" cellpadding="5">
+      <thead><tr><th>Priority</th><th>Item</th><th>Name</th></tr></thead>
+      <template repeat="{{item in items}}">
+        <tr key="{{item.$key}}">
+          <td><input value="[[item.$priority]]" onchange="prioritize(this)" size="3"></td>
+          <td>{{item.item}}</td>
+          <td>{{item.name}}</td>
+          <td><button onclick="removeItem(this)">Remove</button></td>
+        </tr>
+      </template>
+    </table>
+  </template>
+  <p>
+    <button id="add" onclick="addItem()">Add Item</button>
+    <button id="randomize" onclick="randomize()">Randomize Priorities</button>
+    <button id="reverse" onclick="toggleReverse()">Reverse Order</button>
+  </p>
+  <script>
+    var items = ['Apples', 'Bananas', 'Cherries', 'Dates', 'Eggs', 'Flour', 'Granola', 'Ham', 'Ice Cream', 'Jelly', 'Kumquats', 'Lollipops', 'Mint', 'Nectarines', 'Oranges', 'Pears', 'Quinoa', 'Rutabega', 'Soda', 'Tarts'];
+    var names = ['Alice', 'Bob', 'Charlie', 'Dan', 'Edward', 'Florence', 'Grace', 'Heather', 'Irene', 'Janet'];
+    function addItem() {
+      var newRef = document.getElementById('base').push({
+        item: items[Math.floor(Math.random() * items.length)],
+        name: names[Math.floor(Math.random() * names.length)]
+      });
+      newRef.setPriority(Math.ceil(Math.random() * 100));
+    }
+
+    function removeItem(el) {
+      document.getElementById('base').remove(el.parentElement.parentElement.getAttribute('key'));
+    }
+
+    function randomize() {
+      var data = document.getElementById('base').data;
+      for (i in data) {
+        data[i].$priority = Math.ceil(Math.random() * 100);
+      }
+    }
+
+    function toggleReverse() {
+      var base = document.getElementById('base');
+      base.reverse = !base.reverse;
+    }
+
+    function prioritize(el) {
+      console.log(el.parentElement.parentElement);
+      document.getElementById('base').getChild(el.parentElement.parentElement.getAttribute('key')).$priority = parseInt(el.value);
+    }
+  </script>
+</body>
+</html>
