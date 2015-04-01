@@ -145,6 +145,20 @@ Example:
        */
 
       /**
+       * Fired when the data binded by the 'dataToCheck' attribute
+       * already exists on the remote location.
+       *
+       * @event data-exists
+      */
+
+      /**
+       * Fired when the data binded by the 'dataToCheck' attribute
+       * does not exist on the remote location.
+       *
+       * @event data-does-not-exist
+      */
+
+      /**
        * Fired when an error occurs on an interaction with Firebase.  The
        * `details.error` property contains the `Error` object provided by
        * the Firebase API.
@@ -255,6 +269,18 @@ Example:
        * @type Boolean
        */
       dataReady: false,
+      /**
+      * Bind some data to check if data exists on firebase.
+      * @attribute dataToCheck
+      * @type string
+      */
+      dataToCheck: null,
+      /**
+      * 'dataExists' true when data exists, false when data does not exist.
+      * @attribute dataExists
+      * @type string
+      */
+      dataExists: false,
       /**
        * If true, will log various occurances to the console api.
        * @attribute log
@@ -527,6 +553,25 @@ Example:
       }
       this.dataChange();
       return neo;
+    },
+    checkData: function(snapshot) {
+      this.ref.child(this.dataToCheck).once('value', function(snapshot) {
+        var exists = (snapshot.val() !== null);
+        if (exists) {
+          sessionStorage.setItem('firebase:data-exists', true);
+        } else {
+          sessionStorage.removeItem('firebase:data-exists');
+        }
+      });
+    },
+    dataToCheckChanged: function() {
+      if(sessionStorage.getItem('firebase:data-exists')) {
+        this.dataExists = true;
+        this.fire('data-exists');
+      }else{
+        this.dataExists = false;
+        this.fire('data-does-not-exist');
+      }
     },
     errorHandler: function(error) {
       if (error) {
