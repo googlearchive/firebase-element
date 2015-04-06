@@ -294,9 +294,9 @@ Element wrapper for the Firebase authentication API (https://www.firebase.com/do
      * @param {string} password
      */
     createUser: function(email, password) {
-        this.ref.createUser({email: email, password: password}, function(error) {
+        this.ref.createUser({email: email, password: password}, function(error, userData) {
           if (!error) {
-            this.fire('user-created');
+            this.fire('user-created', userData);
           } else {
             this.fire('error', error);
           }
