@@ -1,6 +1,9 @@
 firebase-element
 ================
 
+**This element is compatible with Polymer 0.5 and lower only, and will be deprecated.**  
+You can check out a similar 0.8-compatible version of this element at [https://github.com/polymerelements/firebase-element](https://github.com/polymerelements/firebase-element)
+
 See the [component page](http://polymer.github.io/firebase-element) for more information.
 
 firebase-import
