@@ -14,15 +14,15 @@
   <title>firebase-element</title>
 
   <script src="../../webcomponentsjs/webcomponents.js"></script>
-  
+
   <link rel="import" href="../firebase-element.html">
 
 </head>
-<body unresolved>
+<body>
 
-  <template is="auto-binding">
+  <template is="x-autobind">
 
-    <firebase-element id="base" on-data-change="{{dataChange}}" data="{{data}}" location="https://treedata-demo.firebaseio.com/demo" log></firebase-element>
+    <firebase-element id="base" on-data-change="dataChange" data="{{data}}" location="https://treedata-demo.firebaseio.com/demo" log></firebase-element>
 
     <h3>Top-level properties persist automatically:</h3>
 
@@ -35,70 +35,67 @@
     <h3>Nested properties must be persisted manually:</h3>
 
     <input value="{{data.more.color}}">
-    
-    <button on-tap="{{commitMore}}">Commit data.more</button>
-     
+
+    <button on-tap="commitMore">Commit data.more</button>
+
     <hr>
-    
+
     <h3>Remote Data</h3>
     <pre>{{json}}</pre>
 
     <hr>
 
-    <button on-tap="{{resetLocal}}">Reset Local</button>
-    <button on-tap="{{removeLocal}}">Remove Local</button>
-    <button on-tap="{{resetRemote}}">Reset remote</button>
-    <button on-tap="{{removeRemote}}">Remove Remote</button>
+    <button on-tap="resetLocal">Reset Local</button>
+    <button on-tap="removeLocal">Remove Local</button>
+    <button on-tap="resetRemote">Reset remote</button>
+    <button on-tap="removeRemote">Remove Remote</button>
 
 
   </template>
-  
+
   <script>
-    
-    addEventListener('template-bound', function(e) {
 
-      scope = e.target;
+    scope = document.querySelector('template');
 
-      scope.resetLocal = function() {
-        // direct setting of data is persisted automatically
-        this.data = {
-          name: 'anonymous',
-          info: 'none',
-          more: {
-            color: "yellow"
-          }
-        };
+    scope.resetLocal = function() {
+      // direct setting of data is persisted automatically
+      this.data = {
+        name: 'anonymous',
+        info: 'none',
+        more: {
+          color: "yellow"
+        }
       };
+    };
 
-      scope.removeLocal = function() {
-        this.data = null;
-      };
-      
-      scope.resetRemote = function() {
-        // Simulate other actor setting data to same remote location
-        new Firebase('https://treedata-demo.firebaseio.com/demo').set({
-          name: 'anonymous',
-          info: 'none',
-          more: {
-            color: "yellow"
-          }
-        });
-      };
+    scope.removeLocal = function() {
+      this.data = null;
+    };
 
-      scope.removeRemote = function() {
-        // Simulate other actor removing data from same remote location
-        new Firebase('https://treedata-demo.firebaseio.com/demo').remove();
-      };
+    scope.resetRemote = function() {
+      // Simulate other actor setting data to same remote location
+      new Firebase('https://treedata-demo.firebaseio.com/demo').set({
+        name: 'anonymous',
+        info: 'none',
+        more: {
+          color: "yellow"
+        }
+      });
+    };
 
-      scope.commitMore = function() {
-        this.$.base.commitProperty('more');
-      };
-      
-      scope.dataChange = function() {
-        this.json = JSON.stringify(this.data, null, '\t');
-      };
-      
-    });
+    scope.removeRemote = function() {
+      // Simulate other actor removing data from same remote location
+      new Firebase('https://treedata-demo.firebaseio.com/demo').remove();
+    };
+
+    scope.commitMore = function() {
+      this.$.base.commitProperty('more');
+    };
+
+    scope.dataChange = function() {
+      this.json = JSON.stringify(this.data, null, '\t');
+    };
+
   </script>
 
 </body>

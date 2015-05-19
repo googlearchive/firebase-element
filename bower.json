@@ -2,7 +2,8 @@
   "name": "firebase-element",
   "private": true,
   "dependencies": {
-    "polymer": "Polymer/polymer#master",
-    "firebase": "^2.2"
+    "polymer": "Polymer/polymer#0.8.0-rc.1",
+    "firebase": "^2.2",
+    "observe-js": "~0.5.5"
   }
 }
